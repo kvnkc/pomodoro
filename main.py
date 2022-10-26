@@ -11,6 +11,7 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
+timer = None
 # Pomodoro Timer
 
 
@@ -43,9 +44,25 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text=f'{count_min}:{count_sec}')
     if count > 0:
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
     else:
         start_timer()
+        marks = ''
+        for _ in range(math.floor(reps/2)):
+            mark += '✓'
+        check_mark_label.config(text=marks)
+
+# Pomodoro Reset
+
+
+def reset_timer():
+    global reps
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text='00:00')
+    timer_label.config(text='Timer')
+    check_mark_label.config(text='')
+    reps = 0
 
 
 # Pomodoro UI
@@ -58,7 +75,7 @@ timer_label = tkinter.Label(
 timer_label.grid(row=0, column=1)
 
 check_mark_label = tkinter.Label(
-    text='✓', font=(FONT_NAME, 14, 'bold'), fg=GREEN, bg=YELLOW, highlightthickness=0)
+    font=(FONT_NAME, 14, 'bold'), fg=GREEN, bg=YELLOW, highlightthickness=0)
 check_mark_label.grid(row=3, column=1)
 
 canvas = tkinter.Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
@@ -72,7 +89,7 @@ canvas.grid(row=1, column=1)
 start_button = tkinter.Button(text="Start", command=start_timer)
 start_button.grid(row=2, column=0)
 
-reset_button = tkinter.Button(text='Reset')
+reset_button = tkinter.Button(text='Reset', command=reset_timer)
 reset_button.grid(row=2, column=2)
 
 window.mainloop()
